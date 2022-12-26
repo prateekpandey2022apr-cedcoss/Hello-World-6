@@ -1,0 +1,51 @@
+.otp_container {
+    width: 40%;
+    margin: 0 auto;
+    border: 1px solid #e3e3e3;
+    padding: 15px 20px;
+    border-radius: 4px;
+}
+
+.otp_container .input_list {
+    /* text-align: center; */
+}
+
+.otp_container .otp_message {
+    margin-bottom: 20px;
+}
+
+.otp_container input {
+    width: 30px;
+    padding: 5px 10px;
+    text-align: center;
+    display: inline-block;
+}
+
+.otp_container .timer {
+    margin-top: 20px;
+}
+
+.otp_container .timer a.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.otp_container button {
+    margin-top: 20px;
+    padding: 7px 25px;
+    width: 100%;
+}
+
+.otp_container button:disabled {
+    cursor: not-allowed;
+}
+
+.otp_container .otp_error {
+    margin-top: 20px;
+    color: red;
+}
+
+.otp_container .otp_success {
+    margin-top: 20px;
+    color: green;
+}
