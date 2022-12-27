@@ -47,6 +47,15 @@ const Otp = (props) => {
     };
   }, [otpTimeout]);
 
+  const check = isInputsFilled === true;
+
+  useEffect(() => {
+    if (isInputsFilled) {
+      setIsLoading(true);
+      submit();
+    }
+  }, [check]);
+
   function submit() {
     console.log("submitting");
 
@@ -189,12 +198,12 @@ const Otp = (props) => {
                     if (event.key === "Backspace") {
                       backward(idx, event);
                     }
-                    if (isInputsFilled) {
-                      if (event.key === "Enter") {
-                        setIsLoading(true);
-                        submit();
-                      }
-                    }
+                    // if (isInputsFilled) {
+                    //   if (event.key === "Enter") {
+                    //     setIsLoading(true);
+                    //     submit();
+                    //   }
+                    // }
                   }}
                   value={otpInput[idx] ?? ""}
                 ></input>
