@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./Otp.css";
 
 const Otp = (props) => {
-  const { otpChars, timeout, message, attempts } = props;
+  const { otpLength, timeout, message, attempts } = props;
 
   // to store user inputs
   const [otpInput, setOtpInput] = useState({});
@@ -28,7 +28,7 @@ const Otp = (props) => {
   useEffect(() => {
     // move focus to the first input box
     focusFirstInput();
-    setGeneratedOTP(generateRadomOTP(otpChars));
+    setGeneratedOTP(generateRadomOTP(otpLength));
   }, []);
 
   useEffect(() => {
@@ -99,7 +99,7 @@ const Otp = (props) => {
   function updateInputFilled(tempOtpInput) {
     setIsInputFilled(
       Object.values(tempOtpInput).filter((val) => val !== "").length ===
-        otpChars
+        otpLength
     );
   }
 
@@ -121,7 +121,7 @@ const Otp = (props) => {
   }
 
   function forward(idx, event) {
-    if (event.target.value.length === otpChars) {
+    if (event.target.value.length === otpLength) {
       paste(event.target.value);
       return;
     }
@@ -131,7 +131,7 @@ const Otp = (props) => {
 
     if (input.length === 1) {
       tempOtpInput = { ...tempOtpInput, [idx]: input };
-      if (idx !== otpChars - 1) {
+      if (idx !== otpLength - 1) {
         inputRef.current[idx + 1].focus();
       }
     }
@@ -142,7 +142,7 @@ const Otp = (props) => {
         [idx]: input.replace(otpInput[idx], ""),
       };
 
-      if (idx !== otpChars - 1) {
+      if (idx !== otpLength - 1) {
         inputRef.current[idx + 1].focus();
       }
     }
@@ -169,7 +169,7 @@ const Otp = (props) => {
       <div className="otp_message">{message + " (" + generatedOTP + ") "}</div>
       <div className="otp_message">Enter your code here:</div>
       <div className="input_list">
-        {Array(otpChars)
+        {Array(otpLength)
           .fill(0)
           .map((item, idx) => {
             return (
@@ -179,7 +179,6 @@ const Otp = (props) => {
                   // maxLength={1}
                   onChange={(event) => {
                     // debugger;
-                    // console.log(event);
                     setIsSubmitted(false);
                     if (/^\d+$/.test(event.target.value)) {
                       forward(idx, event);
@@ -211,6 +210,7 @@ const Otp = (props) => {
                   href="#/"
                   onClick={() => {
                     if (totalAttempts > 0) {
+                      setGeneratedOTP(generateRadomOTP(otpLength));
                       setOtpTimeout(resetTimer());
                       setTotalAttempts(totalAttempts - 1);
                       focusFirstInput();
@@ -240,7 +240,13 @@ const Otp = (props) => {
         )}
       </div>
       <div>
-        <button disabled={!isInputsFilled}>
+        <button
+          disabled={!isInputsFilled}
+          onClick={() => {
+            setIsLoading(true);
+            submit();
+          }}
+        >
           {isLoading ? (
             <>
               <i className="fa-solid fa-rotate fa-spin"></i>
