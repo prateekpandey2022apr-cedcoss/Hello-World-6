@@ -118,6 +118,7 @@ const Otp = (props) => {
     });
 
     setOtpInput(temp);
+    updateInputFilled(temp);
   }
 
   function forward(idx, event) {
