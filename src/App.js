@@ -4,17 +4,18 @@ import Otp from "./Components/Otp/Otp";
 import RandomOTP from "./Components/RandomOTP/RandomOTP";
 
 function App() {
-  const otpLength = 5;
+  const otpLength = 4;
   const email = "abc@mail.com";
 
   return (
     <div className="page">
       <Otp
         otpFromServer
-        otpLength={otpLength}
+        otpLength={4}
         timeout={5}
+        allowedChars="alphanum"
         message={`An email with an OTP has been sent to ${email}.`}
-        attempts={4}
+        attempts={2}
       />
     </div>
   );

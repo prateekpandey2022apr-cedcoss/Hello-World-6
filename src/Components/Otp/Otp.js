@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./Otp.css";
 
 const Otp = (props) => {
-  const { otpLength, timeout, message, attempts } = props;
+  const { otpLength, timeout, message, attempts, allowedChars } = props;
 
   // to store user inputs
   const [otpInput, setOtpInput] = useState({});
@@ -38,7 +38,7 @@ const Otp = (props) => {
 
     if (otpTimeout < 1) {
       clearInterval(int);
-      console.log("cleared");
+      // console.log("cleared");
     }
 
     return () => {
@@ -47,36 +47,33 @@ const Otp = (props) => {
     };
   }, [otpTimeout]);
 
-  const check = isInputsFilled === true;
+  const allFilledTrue = isInputsFilled === true;
 
   useEffect(() => {
     if (isInputsFilled) {
+      disableInputs();
       setIsLoading(true);
       submit();
     }
-  }, [check]);
+  }, [allFilledTrue]);
 
   function submit() {
-    console.log("submitting");
-
-    let success;
-
+    // console.log("submitting");
     setTimeout(() => {
-      success = Math.floor(Math.random() * 2);
       const otpInputStr = Object.values(otpInput).join("");
       setIsSubmitted(true);
       if (otpInputStr === generatedOTP) {
         setIsSuccess(true);
-        // alert("Success. Redirecting you to Dashboard");
       } else {
         setIsSuccess(false);
+        enableInputs();
       }
 
       setIsLoading(false);
       setIsInputFilled(false);
       clearInputField();
       focusFirstInput();
-      setTotalAttempts(attempts);
+      setTotalAttempts(totalAttempts);
     }, 2000);
   }
 
@@ -96,7 +93,7 @@ const Otp = (props) => {
     setOtpInput({});
   }
 
-  function getMinSec(seconds) {
+  function getRemainingTime(seconds) {
     // get minutes
     const min = Math.floor(seconds / 60);
     // get seconds
@@ -173,6 +170,29 @@ const Otp = (props) => {
     updateInputFilled(tempOtpInput);
   }
 
+  function charFilter(chars, value) {
+    switch (chars) {
+      case "digit":
+        return /^\d+$/.test(value);
+      case "alpha":
+        return /^[a-z]+$/i.test(value);
+      case "alphanum":
+        return /^[a-z\d]+$/i.test(value);
+      default:
+        throw Error(
+          `Invalid character set "${chars}". Available options: digit, alpha and alphanum`
+        );
+    }
+  }
+
+  function disableInputs() {
+    inputRef.current.map((item) => (item.disabled = true));
+  }
+
+  function enableInputs() {
+    inputRef.current.map((item) => (item.disabled = false));
+  }
+
   return (
     <div className="otp_container">
       <div className="opt_success">{isSuccess}</div>
@@ -190,7 +210,7 @@ const Otp = (props) => {
                   onChange={(event) => {
                     // debugger;
                     setIsSubmitted(false);
-                    if (/^\d+$/.test(event.target.value)) {
+                    if (charFilter(allowedChars, event.target.value)) {
                       forward(idx, event);
                     }
                   }}
@@ -233,8 +253,8 @@ const Otp = (props) => {
               </>
             ) : (
               <span>
-                RESEND OTP IN {getMinSec(otpTimeout)} ({totalAttempts} Attemps
-                left)
+                RESEND OTP IN {getRemainingTime(otpTimeout)} ({totalAttempts}{" "}
+                Attemps left)
               </span>
             )}
           </>
