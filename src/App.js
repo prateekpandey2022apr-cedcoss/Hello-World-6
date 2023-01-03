@@ -11,12 +11,13 @@ function App() {
     <div className="page">
       <Otp
         otpLength={4}
-        timeout={30}
-        allowedChars="digit"
+        timeout={5 * 60}
+        allowedChars="alphanum"
         message={`An email with an OTP has been sent to ${email}.`}
-        attempts={2}
-        submitOn={"filled"}
+        attempts={6}
+        submitOnEnter={false}
       />
+      {/* <Otp2 /> */}
     </div>
   );
 }

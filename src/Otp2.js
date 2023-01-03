@@ -9,16 +9,20 @@ const Otp2 = () => {
     inputRef.current[0].focus();
   }, []);
 
-  function forward(idx, event) {
-    console.log("forward");
-    setInputState({ ...inputState, [idx]: event.target.value });
-    if (idx !== 3) {
-      inputRef.current[idx + 1].focus();
-    }
-  }
+  // useEffect(() => {
+  //   document.addEventListener("keydown", (event) => {
+  //     //   debugger;
+  //     if (event.key === "Backspace") {
+  //       console.log("useff");
+  //       inputRef.current[0].select();
+  //     }
+  //   });
+  // }, []);
 
   function backward(idx) {
+    // console.log("back");
     console.log(idx);
+    // debugger;
     let tempInputState = inputState;
     tempInputState = { ...tempInputState, [idx]: "" };
     setInputState({ ...tempInputState });
@@ -36,20 +40,31 @@ const Otp2 = () => {
           return (
             <span key={idx}>
               <input
+                maxLength={1}
                 ref={(el) => (inputRef.current[idx] = el)}
                 onChange={(event) => {
+                  // debugger;
                   console.log("onchange");
+                  console.log(event);
                   if (/^\d+$/.test(event.target.value)) {
-                    forward(idx, event);
+                    setInputState({ ...inputState, [idx]: event.target.value });
+                    if (idx !== 3) {
+                      inputRef.current[idx + 1].focus();
+                    }
                   }
                 }}
-                onKeyDown={(event) => {
-                  if (event.key === "Backspace") {
-                    event.nativeEvent.preventDefault();
-                    console.log("onbackspace");
-                    backward(idx);
-                  }
-                }}
+                // onKeyDown={(event) => {
+                //   console.log(event.keyCode);
+                //   if (event.keyCode === 8) {
+                //     console.log(event.keyCode);
+                //     // debugger;
+                //     // event.nativeEvent.stopImmediatePropagation();
+                //     // inputRef.current[idx].focus();
+                //     // console.log("!!");
+                //     // debugger;
+                //     backward(idx);
+                //   }
+                // }}
                 value={inputState[idx] ?? ""}
               ></input>
             </span>

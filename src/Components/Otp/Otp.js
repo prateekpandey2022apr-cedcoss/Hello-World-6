@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./Otp.css";
 
 const Otp = (props) => {
-  const { otpLength, timeout, message, attempts, allowedChars, submitOn } =
+  const { otpLength, timeout, message, attempts, allowedChars, submitOnEnter } =
     props;
 
   // to store user inputs
@@ -48,7 +48,7 @@ const Otp = (props) => {
   const allFilledTrueCheck = isAllInputsFilled() === true;
 
   useEffect(() => {
-    if (submitOn === "filled") {
+    if (submitOnEnter === false) {
       if (allFilledTrueCheck) {
         // console.log("filled");
         disableInputs();
@@ -73,7 +73,7 @@ const Otp = (props) => {
       setIsLoading(false);
       clearInputField();
       focusFirstInput();
-      setTotalAttempts((prevState) => prevState + 1);
+      // setTotalAttempts((prevState) => prevState + 1);
     }, 2000);
   }
 
@@ -126,6 +126,9 @@ const Otp = (props) => {
   }
 
   function forward(idx, event) {
+    // debugger;
+    // event.nativeEvent.preventDefault();
+
     // to handle when a input box is already filled and user
     // tries to paste the OTP
     if (event.target.value.length === otpLength + 1) {
@@ -211,22 +214,52 @@ const Otp = (props) => {
                 <input
                   ref={(el) => (inputRef.current[idx] = el)}
                   // maxLength={1}
-                  onChange={(event) => {
-                    // console.log("onchange");
+                  onInput={(event) => {
+                    console.log("onchange");
+                    // debugger;
                     setIsSubmitted(false);
                     if (charFilter(allowedChars, event.target.value)) {
                       forward(idx, event);
                     }
                   }}
                   onKeyDown={(event) => {
-                    // console.log("onkeydown");
+                    // debugger;
+
+                    console.log("onkeydown");
+                    // event.nativeEvent.preventDefault();
+
+                    console.log({
+                      otp: otpInput,
+                      val: event.target.value,
+                    });
+
+                    // console.log(event.key);
                     if (event.key === "Backspace") {
                       backward(idx, event);
                     }
+
+                    //
                     if (isAllInputsFilled()) {
                       if (event.key === "Enter") {
                         setIsLoading(true);
                         submit();
+                      }
+                    }
+
+                    //
+                    if (event.key === "ArrowRight") {
+                      if (idx !== otpLength - 1) {
+                        event.nativeEvent.preventDefault();
+                        inputRef.current[idx + 1].focus();
+                        inputRef.current[idx + 1].select();
+                      }
+                    }
+
+                    if (event.key === "ArrowLeft") {
+                      if (idx !== 0) {
+                        event.nativeEvent.preventDefault();
+                        inputRef.current[idx - 1].focus();
+                        inputRef.current[idx - 1].select();
                       }
                     }
                   }}
