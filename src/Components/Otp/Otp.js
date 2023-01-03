@@ -2,16 +2,14 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./Otp.css";
 
 const Otp = (props) => {
-  const { otpLength, timeout, message, attempts, allowedChars } = props;
+  const { otpLength, timeout, message, attempts, allowedChars, submitOn } =
+    props;
 
   // to store user inputs
   const [otpInput, setOtpInput] = useState({});
 
   // to store timeout in seconds
   const [otpTimeout, setOtpTimeout] = useState(resetTimer());
-
-  // state to determine wether all inputs are filled or not
-  const [isInputsFilled, setIsInputFilled] = useState(false);
 
   // by defaults to 4 attempts are allowed
   const [totalAttempts, setTotalAttempts] = useState(attempts ?? 4);
@@ -47,15 +45,18 @@ const Otp = (props) => {
     };
   }, [otpTimeout]);
 
-  const allFilledTrue = isInputsFilled === true;
+  const allFilledTrueCheck = isAllInputsFilled() === true;
 
   useEffect(() => {
-    if (isInputsFilled) {
-      disableInputs();
-      setIsLoading(true);
-      submit();
+    if (submitOn === "filled") {
+      if (allFilledTrueCheck) {
+        // console.log("filled");
+        disableInputs();
+        setIsLoading(true);
+        submit();
+      }
     }
-  }, [allFilledTrue]);
+  }, [allFilledTrueCheck]);
 
   function submit() {
     // console.log("submitting");
@@ -70,10 +71,9 @@ const Otp = (props) => {
       }
 
       setIsLoading(false);
-      setIsInputFilled(false);
       clearInputField();
       focusFirstInput();
-      setTotalAttempts(totalAttempts);
+      setTotalAttempts((prevState) => prevState + 1);
     }, 2000);
   }
 
@@ -102,10 +102,9 @@ const Otp = (props) => {
     return `${min}:${String(secs).padStart(2, 0)}`;
   }
 
-  function updateInputFilled(tempOtpInput) {
-    setIsInputFilled(
-      Object.values(tempOtpInput).filter((val) => val !== "").length ===
-        otpLength
+  function isAllInputsFilled() {
+    return (
+      Object.values(otpInput).filter((val) => val !== "").length === otpLength
     );
   }
 
@@ -124,10 +123,16 @@ const Otp = (props) => {
     });
 
     setOtpInput(temp);
-    updateInputFilled(temp);
   }
 
   function forward(idx, event) {
+    // to handle when a input box is already filled and user
+    // tries to paste the OTP
+    if (event.target.value.length === otpLength + 1) {
+      paste(event.target.value.slice(1));
+      return;
+    }
+
     if (event.target.value.length === otpLength) {
       paste(event.target.value);
       return;
@@ -143,7 +148,7 @@ const Otp = (props) => {
       }
     }
 
-    if (input.length === 2) {
+    if (input.length === 2 && otpInput[idx]) {
       tempOtpInput = {
         ...tempOtpInput,
         [idx]: input.replace(otpInput[idx], ""),
@@ -155,19 +160,18 @@ const Otp = (props) => {
     }
 
     setOtpInput({ ...tempOtpInput });
-    updateInputFilled(tempOtpInput);
   }
 
   function backward(idx, event) {
+    event.nativeEvent.preventDefault();
     let tempOtpInput = otpInput;
     tempOtpInput = { ...tempOtpInput, [idx]: "" };
     setOtpInput({ ...tempOtpInput });
 
     if (idx !== 0) {
       inputRef.current[idx - 1].focus();
+      inputRef.current[idx - 1].select();
     }
-
-    updateInputFilled(tempOtpInput);
   }
 
   function charFilter(chars, value) {
@@ -208,22 +212,23 @@ const Otp = (props) => {
                   ref={(el) => (inputRef.current[idx] = el)}
                   // maxLength={1}
                   onChange={(event) => {
-                    // debugger;
+                    // console.log("onchange");
                     setIsSubmitted(false);
                     if (charFilter(allowedChars, event.target.value)) {
                       forward(idx, event);
                     }
                   }}
                   onKeyDown={(event) => {
+                    // console.log("onkeydown");
                     if (event.key === "Backspace") {
                       backward(idx, event);
                     }
-                    // if (isInputsFilled) {
-                    //   if (event.key === "Enter") {
-                    //     setIsLoading(true);
-                    //     submit();
-                    //   }
-                    // }
+                    if (isAllInputsFilled()) {
+                      if (event.key === "Enter") {
+                        setIsLoading(true);
+                        submit();
+                      }
+                    }
                   }}
                   value={otpInput[idx] ?? ""}
                 ></input>
@@ -271,7 +276,7 @@ const Otp = (props) => {
       </div>
       <div>
         <button
-          disabled={!isInputsFilled}
+          disabled={!allFilledTrueCheck}
           onClick={() => {
             setIsLoading(true);
             submit();
