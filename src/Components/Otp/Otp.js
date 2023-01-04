@@ -6,7 +6,13 @@ const Otp = (props) => {
     props;
 
   // to store user inputs
-  const [otpInput, setOtpInput] = useState({});
+  const [otpInput, setOtpInput] = useState(() => {
+    const temp = {};
+
+    return Array(otpLength)
+      .fill(0)
+      .map((item, idx) => (temp[idx] = ""));
+  });
 
   // to store timeout in seconds
   const [otpTimeout, setOtpTimeout] = useState(resetTimer());
@@ -108,6 +114,12 @@ const Otp = (props) => {
     );
   }
 
+  function isAllInputsEmpty() {
+    return (
+      Object.values(otpInput).filter((val) => val === "").length === otpLength
+    );
+  }
+
   function focusFirstInput() {
     inputRef.current[0].focus();
   }
@@ -137,7 +149,12 @@ const Otp = (props) => {
     }
 
     if (event.target.value.length === otpLength) {
-      paste(event.target.value);
+      // debugger;
+      console.log(isAllInputsEmpty());
+      if (isAllInputsEmpty()) {
+        paste(event.target.value);
+      }
+
       return;
     }
 
