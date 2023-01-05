@@ -3,12 +3,13 @@ import "@cedcommerce/ounce-ui/dist/index.css";
 import Otp from "./Components/Otp/Otp";
 import Search from "./Components/Search/Search";
 import Pros from "./Components/Pros/Pros";
+import Sidebar from "./Components/Sidebar/Sidebar";
 
 function App() {
   const email = "abc@mail.com";
 
   return (
-    <div className="page">
+    <div>
       {/* <Otp
         otpLength={4}
         timeout={5}
@@ -18,6 +19,7 @@ function App() {
         submitOnEnter={false}
       /> */}
       {/* <Search /> */}
+      {/* <Sidebar /> */}
       <Pros />
     </div>
   );
